@@ -1,0 +1,26 @@
+body {
+  margin: 20px;
+  font-family: serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
+    monospace;
+}
+
+.contentBox {
+  width: 50vw;
+  display: grid;
+  grid-template-columns: 80% 20%;
+}
+
+.exer {
+  text-align: right;
+}
+
+.totalBox {
+  font-weight: bold;
+  width: 50vw;
+}
