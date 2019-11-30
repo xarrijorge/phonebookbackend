@@ -17,6 +17,8 @@ app.use(function(req, res, next) {
   next();
 });
 
+app.options("*", cors());
+
 morgan.token("body", function(req, res) {
   return JSON.stringify(req.body);
 });
@@ -99,8 +101,6 @@ let contacts = [
   }
 ];
 let totalContacts = contacts.length;
-
-app.options("*", cors());
 
 app.get("/", (req, res) => {
   res.send("<h1>Hello World!</h1>");
