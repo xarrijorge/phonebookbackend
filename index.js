@@ -126,10 +126,11 @@ app.get("/api/persons/:id", (req, res) => {
 });
 
 app.delete("/api/persons/:id", (req, res) => {
-  res.header("Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, OPTIONS");
+  req.header("Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, OPTIONS");
+  req.method("DELETE");
   const id = Number(req.params.id);
   contacts = contacts.filter(contact => contact.id !== id);
-
+  console.log(req.method);
   res.status(204);
   res.end();
 });
