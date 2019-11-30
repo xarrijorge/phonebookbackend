@@ -90,6 +90,8 @@ let contacts = [
 ];
 let totalContacts = contacts.length;
 
+app.options('*', cors());
+
 app.get('/', (req, res) => {
   res.send('<h1>Hello World!</h1>');
 });
@@ -113,8 +115,7 @@ app.get('/api/persons/:id', (req, res) => {
   }
 });
 
-app.options('/api/persons/:id', cors());
-app.delete('/api/persons/:id', cors(), (req, res) => {
+app.delete('/api/persons/:id', (req, res) => {
   const id = Number(req.params.id);
   contacts = contacts.filter(contact => contact.id !== id);
 
