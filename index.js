@@ -1,8 +1,16 @@
 const express = require("express");
 const app = express();
 const bodyParser = require("body-parser");
+const morgan = require("morgan");
 
 app.use(bodyParser.json());
+
+morgan.token("body", function(req, res) {
+  return JSON.stringify(req.body);
+});
+app.use(
+  morgan(":method :url :status :res[content-length] - :response-time ms :body")
+);
 const PORT = 3001;
 
 let contacts = [
@@ -136,7 +144,7 @@ app.post("/api/persons", (req, res) => {
     id: parseInt(Math.random() * 10000)
   };
 
-  console.log(newPerson);
+  // console.log(newPerson);
 
   contacts = contacts.concat(newPerson);
 
