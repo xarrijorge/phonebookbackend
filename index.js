@@ -126,6 +126,7 @@ app.get("/api/persons/:id", (req, res) => {
 });
 
 app.delete("/api/persons/:id", (req, res) => {
+  res.header("Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, OPTIONS");
   const id = Number(req.params.id);
   contacts = contacts.filter(contact => contact.id !== id);
 
