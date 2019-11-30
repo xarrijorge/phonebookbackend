@@ -6,6 +6,7 @@ const morgan = require("morgan");
 
 app.use(cors());
 app.use(bodyParser.json());
+app.use(express.static("build"));
 
 app.use(function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
