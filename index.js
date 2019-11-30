@@ -79,16 +79,22 @@ let contacts = [
     id: 15
   }
 ];
+let totalContacts = contacts.length;
 
 app.get("/", (req, res) => {
   res.send("<h1>Hello World!</h1>");
 });
 
-app.get("/contacts", (req, res) => {
+app.get("/info", (req, res) => {
+  res.send(`<p>Phonebook has info for ${totalContacts} people</p>
+  <ps>${new Date()}</ps>`);
+});
+
+app.get("/api/persons", (req, res) => {
   res.json(contacts);
 });
 
-app.get("/contacts/:id", (req, res) => {
+app.get("/api/persons/:id", (req, res) => {
   const id = Number(req.params.id);
   const contact = contacts.find(contact => contact.id === id);
   if (contact) {
@@ -98,7 +104,7 @@ app.get("/contacts/:id", (req, res) => {
   }
 });
 
-app.delete("/contacts/:id", (req, res) => {
+app.delete("/api/persons/:id", (req, res) => {
   const id = Number(req.params.id);
   contacts = contacts.filter(contact => contact.id !== id);
 
@@ -106,13 +112,9 @@ app.delete("/contacts/:id", (req, res) => {
   res.end();
 });
 
-const generateId = () => {
-  const maxId = contacts.length > 0 ? Math.max(...contacts.map(n => n.id)) : 0;
-  return maxId + 1;
-};
-
-app.post("/contacts", (req, res) => {
+app.post("/api/persons", (req, res) => {
   const body = req.body;
+  const duplicate = contacts.find(contact => contact.name === body.name);
 
   if (!body.name || !body.number) {
     return res.status(400).json({
@@ -120,16 +122,25 @@ app.post("/contacts", (req, res) => {
     });
   }
 
-  const contact = {
+  if (duplicate) {
+    return res.status(400).json({
+      error: "Name already exists in phonebook"
+    });
+  }
+
+  const newPerson = {
     name: body.name,
     number: body.number,
     important: body.important || false,
     date: new Date(),
-    id: generateId()
+    id: parseInt(Math.random() * 10000)
   };
-  console.log("this is the", contact);
 
-  res.json(contact);
+  console.log(newPerson);
+
+  contacts = contacts.concat(newPerson);
+
+  res.json(newPerson);
 });
 
 app.listen(PORT, () => {
