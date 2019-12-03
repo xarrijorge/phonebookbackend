@@ -6,6 +6,9 @@ if (process.argv.length < 3) {
 }
 
 const password = process.argv[2];
+const contactName = process.argv[3];
+const contactNumber = process.argv[4];
+
 const url = `mongodb+srv://rxdb:${password}@fullstack-qpshs.mongodb.net/phonebook?retryWrites=true&w=majority`;
 
 mongoose.connect(url, { useNewUrlParser: true });
@@ -15,14 +18,24 @@ const contactSchema = new mongoose.Schema({
   number: Number
 });
 
-const Person = mongoose.model("Contact", contactSchema);
+const Contact = mongoose.model("Contact", contactSchema);
 
-const contact = new Person({
-  name: "Victor Von Doom",
-  number: +2390888948989
-});
+if (process.argv.length >= 5) {
+  const contact = new Contact({
+    name: contactName,
+    number: contactNumber
+  });
 
-contact.save().then(res => {
-  console.log("contact saved");
-  mongoose.connection.close();
-});
+  contact.save().then(res => {
+    console.log(`added ${contactName} number ${contactNumber} to phonebook`);
+    mongoose.connection.close();
+  });
+} else {
+  Contact.find({}).then(res => {
+    console.log("phonebook:");
+    res.forEach(person => {
+      console.log(`${person.name} ${person.number}`);
+    });
+    mongoose.connection.close();
+  });
+}
