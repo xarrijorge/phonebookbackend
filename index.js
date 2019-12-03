@@ -30,14 +30,10 @@ app.use(
   morgan(":method :url :status :res[content-length] - :response-time ms :body")
 );
 
-// Routes Declared below =>
 app.get("/", (req, res) => {
   res.send("<h1>Hello World!</h1>");
 });
-app.get("/info", (req, res) => {
-  const total = Contact.find({}).count();
-  res.send(``);
-});
+
 app.get("/api/persons", (req, res) => {
   Contact.find({}).then(contacts => {
     res.json(contacts);
@@ -78,8 +74,6 @@ app.post("/api/persons", (req, res) => {
   res.json(contact);
   res.status(200).end();
 });
-
-// Routes end here
 
 const PORT = process.env.PORT || 3001;
 
