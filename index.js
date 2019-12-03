@@ -30,10 +30,6 @@ app.use(
   morgan(":method :url :status :res[content-length] - :response-time ms :body")
 );
 
-// app.get("/", (req, res) => {
-//   res.send("<h1>Hello World!</h1>");
-// });
-
 app.get("/api/persons", (req, res) => {
   Contact.find({}).then(contacts => {
     res.json(contacts);
