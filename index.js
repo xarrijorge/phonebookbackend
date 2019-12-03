@@ -30,77 +30,8 @@ app.use(
   morgan(":method :url :status :res[content-length] - :response-time ms :body")
 );
 
-let contacts = [
-  {
-    name: "Arto Hellas",
-    number: "040-123456",
-    id: 1
-  },
-  {
-    name: "Ada Lovelace",
-    number: "39-44-5323523",
-    id: 2
-  },
-  {
-    name: "Dan Abramov",
-    number: "12-43-234345",
-    id: 3
-  },
-  {
-    name: "Mary Poppendieck",
-    number: "39-23-6423122",
-    id: 4
-  },
-  {
-    name: "big man ",
-    number: "+334294-332",
-    id: 5
-  },
-  {
-    name: "Another Big man",
-    number: "+01223-4532",
-    id: 6
-  },
-  {
-    name: "a little lil man",
-    number: "09985439389",
-    id: 7
-  },
-  {
-    name: "Poor young dave",
-    number: "00123",
-    id: 8
-  },
-  {
-    name: "Eric badio",
-    number: "+334291808",
-    id: 11
-  },
-  {
-    name: "General Sackie",
-    number: "+233998675998",
-    id: 13
-  },
-  {
-    name: "Ayo Babe",
-    number: "+231886991644",
-    id: 14
-  },
-  {
-    name: "Son Goku",
-    number: "+9000",
-    id: 15
-  }
-];
-let totalContacts = contacts.length;
-
 app.get("/", (req, res) => {
   res.send("<h1>Hello World!</h1>");
-});
-
-app.get("/info", (req, res) => {
-  res.send(`<p>Phonebook has info for ${totalContacts} people</p>
-  <ps>${new Date()}</ps>`);
 });
 
 app.get("/api/persons", (req, res) => {
@@ -117,6 +48,7 @@ app.get("/api/persons/:id", (req, res) => {
   } else {
     res.status(404).end();
   }
+  mongoose.connection.close();
 });
 
 app.delete("/api/persons/:id", (req, res) => {
@@ -131,7 +63,6 @@ app.delete("/api/persons/:id", (req, res) => {
 
 app.post("/api/persons", (req, res) => {
   const body = req.body;
-  const duplicate = contacts.find(contact => contact.name === body.name);
 
   if (!body.name || !body.number) {
     return res.status(400).json({
@@ -139,21 +70,14 @@ app.post("/api/persons", (req, res) => {
     });
   }
 
-  if (duplicate) {
-    return res.status(400).json({
-      error: "Name already exists in phonebook"
-    });
-  }
-
-  const newPerson = {
+  const contact = new Contact({
     name: body.name,
-    number: body.number,
-    id: parseInt(Math.random() * 10000)
-  };
+    number: body.number
+  });
 
-  contacts = contacts.concat(newPerson);
-
-  res.json(newPerson);
+  contact.save();
+  res.json(contact);
+  res.status(200).end();
 });
 
 const PORT = process.env.PORT || 3001;
