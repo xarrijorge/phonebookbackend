@@ -30,9 +30,9 @@ app.use(
   morgan(":method :url :status :res[content-length] - :response-time ms :body")
 );
 
-app.get("/", (req, res) => {
-  res.send("<h1>Hello World!</h1>");
-});
+// app.get("/", (req, res) => {
+//   res.send("<h1>Hello World!</h1>");
+// });
 
 app.get("/api/persons", (req, res) => {
   Contact.find({}).then(contacts => {
@@ -41,14 +41,9 @@ app.get("/api/persons", (req, res) => {
 });
 
 app.get("/api/persons/:id", (req, res) => {
-  const id = Number(req.params.id);
-  const contact = contacts.find(contact => contact.id === id);
-  if (contact) {
-    res.json(contact);
-  } else {
-    res.status(404).end();
-  }
-  mongoose.connection.close();
+  Contact.findById(req.params.id).then(contact => {
+    res.json(contact.toJSON());
+  });
 });
 
 app.delete("/api/persons/:id", (req, res) => {
