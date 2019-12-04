@@ -41,9 +41,18 @@ app.get("/api/persons", (req, res) => {
 });
 
 app.get("/api/persons/:id", (req, res) => {
-  Contact.findById(req.params.id).then(contact => {
-    res.json(contact.toJSON());
-  });
+  Contact.findById(req.params.id)
+    .then(contact => {
+      if (contact) {
+        res.json(contact.toJSON());
+      } else {
+        res.status(404).end();
+      }
+    })
+    .catch(error => {
+      console.log(error);
+      res.status(400).send("Wrong ID format, Please edit and try again");
+    });
 });
 
 app.delete("/api/persons/:id", (req, res) => {
