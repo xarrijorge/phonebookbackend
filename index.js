@@ -40,7 +40,7 @@ app.get("/api/persons", (req, res) => {
   });
 });
 
-app.get("/api/persons/:id", (req, res) => {
+app.get("/api/persons/:id", (req, res, next) => {
   Contact.findById(req.params.id)
     .then(contact => {
       if (contact) {
@@ -49,20 +49,7 @@ app.get("/api/persons/:id", (req, res) => {
         res.status(404).end();
       }
     })
-    .catch(error => {
-      console.log(error);
-      res.status(400).send("Wrong ID format, Please edit and try again");
-    });
-});
-
-app.delete("/api/persons/:id", (req, res) => {
-  req.header("Access-Control-Allow-Methods", "PUT, POST, GET, DELETE, OPTIONS");
-  req.method("DELETE");
-  const id = Number(req.params.id);
-  contacts = contacts.filter(contact => contact.id !== id);
-  console.log(req.method);
-  res.status(204);
-  res.end();
+    .catch(error => next(error));
 });
 
 app.post("/api/persons", (req, res) => {
@@ -84,6 +71,13 @@ app.post("/api/persons", (req, res) => {
   res.status(200).end();
 });
 
+app.delete("/api/persons/:id", (req, res, next) => {
+  Contact.findByIdAndDelete(req.params.id)
+    .then(result => {
+      res.status(204).end();
+    })
+    .catch(error => next(error));
+});
 const PORT = process.env.PORT || 3001;
 
 app.listen(PORT, () => {
