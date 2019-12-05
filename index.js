@@ -1,45 +1,47 @@
-require("dotenv").config();
-const express = require("express");
+require('dotenv').config();
+const express = require('express');
 const app = express();
-const cors = require("cors");
-const bodyParser = require("body-parser");
-const morgan = require("morgan");
+const cors = require('cors');
+const bodyParser = require('body-parser');
+const morgan = require('morgan');
 
-const Contact = require("./models/contactsModel");
+const Contact = require('./models/contactsModel');
 app.use(cors());
 app.use(bodyParser.json());
-app.use(express.static("build"));
+app.use(express.static('build'));
 
 app.use(function(req, res, next) {
-  res.header("Access-Control-Allow-Origin", "*");
+  res.header('Access-Control-Allow-Origin', '*');
   res.header(
-    "Access-Control-Allow-Headers",
-    "Origin, X-Requested-With, Content-Type, Accept"
+    'Access-Control-Allow-Headers',
+    'Origin, X-Requested-With, Content-Type, Accept'
   );
-  res.header("Access-Control-Allow-Methods", "PUT, POST, DELETE, OPTIONS");
+  res.header('Access-Control-Allow-Methods', 'PUT, POST, DELETE, OPTIONS');
   next();
 });
 
-app.options("*", cors());
+app.options('*', cors());
 
-morgan.token("body", function(req, res) {
+morgan.token('body', function(req, res) {
   return JSON.stringify(req.body);
 });
 app.use(
-  morgan(":method :url :status :res[content-length] - :response-time ms :body")
+  morgan(':method :url :status :res[content-length] - :response-time ms :body')
 );
 
-app.get("/", (req, res) => {
-  res.send("<h1>Hello World!</h1>");
+app.get('/', (req, res) => {
+  res.send('<h1>Hello World!</h1>');
 });
 
-app.get("/info", (req, res, next) => {
+app.get('/info', (req, res, next) => {
   Contact.countDocuments({}).then(count => {
-    res.send(`<h4>Phonebook has ${count} people</h4><h4>${new Date()}</h4>`);
+    res
+      .send(`<h4>Phonebook has ${count} people</h4><h4>${new Date()}</h4>`)
+      .catch(error => next(error));
   });
 });
 
-app.get("/api/persons", (req, res, next) => {
+app.get('/api/persons', (req, res, next) => {
   Contact.find({})
     .then(contacts => {
       res.json(contacts);
@@ -47,7 +49,7 @@ app.get("/api/persons", (req, res, next) => {
     .catch(error => next(error));
 });
 
-app.get("/api/persons/:id", (req, res, next) => {
+app.get('/api/persons/:id', (req, res, next) => {
   Contact.findById(req.params.id)
     .then(contact => {
       if (contact) {
@@ -59,12 +61,12 @@ app.get("/api/persons/:id", (req, res, next) => {
     .catch(error => next(error));
 });
 
-app.post("/api/persons", (req, res, next) => {
+app.post('/api/persons', (req, res, next) => {
   const body = req.body;
 
   if (!body.name || !body.number) {
     return res.status(400).json({
-      error: "missing name or number"
+      error: 'missing name or number'
     });
   }
 
@@ -76,13 +78,13 @@ app.post("/api/persons", (req, res, next) => {
   contact
     .save()
     .then(savedContact => {
-      res.json(contact.toJSON());
+      res.json(savedContact.toJSON());
       res.status(200).end();
     })
     .catch(error => next(error));
 });
 
-app.put("/api/persons/:id", (req, res, next) => {
+app.put('/api/persons/:id', (req, res, next) => {
   const body = req.body;
 
   const contact = {
@@ -96,7 +98,7 @@ app.put("/api/persons/:id", (req, res, next) => {
     .catch(error => next(error));
 });
 
-app.delete("/api/persons/:id", (req, res, next) => {
+app.delete('/api/persons/:id', (req, res, next) => {
   Contact.findByIdAndDelete(req.params.id)
     .then(result => {
       res.status(204).end();
@@ -105,7 +107,7 @@ app.delete("/api/persons/:id", (req, res, next) => {
 });
 
 const unknownEndpoint = (request, response) => {
-  response.status(404).send({ error: "unknown endpoint" });
+  response.status(404).send({ error: 'unknown endpoint' });
 };
 
 // handler of requests with unknown endpoint
@@ -114,9 +116,9 @@ app.use(unknownEndpoint);
 const errorHandler = (error, request, response, next) => {
   console.error(error.message);
 
-  if (error.name === "CastError" && error.kind === "ObjectId") {
-    return response.status(400).send({ error: "malformatted id" });
-  } else if (error.name === "ValidationError") {
+  if (error.name === 'CastError' && error.kind === 'ObjectId') {
+    return response.status(400).send({ error: 'malformatted id' });
+  } else if (error.name === 'ValidationError') {
     return response.status(400).json({ error: error.message });
   }
 
