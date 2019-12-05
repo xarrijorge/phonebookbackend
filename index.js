@@ -5,7 +5,7 @@ const cors = require("cors");
 const bodyParser = require("body-parser");
 const morgan = require("morgan");
 
-const Contact = require("./models/contacts");
+const Contact = require("./models/contactsModel");
 app.use(cors());
 app.use(bodyParser.json());
 app.use(express.static("build"));
@@ -59,7 +59,7 @@ app.get("/api/persons/:id", (req, res, next) => {
     .catch(error => next(error));
 });
 
-app.post("/api/persons", (req, res) => {
+app.post("/api/persons", (req, res, next) => {
   const body = req.body;
 
   if (!body.name || !body.number) {
@@ -73,9 +73,13 @@ app.post("/api/persons", (req, res) => {
     number: body.number
   });
 
-  contact.save();
-  res.json(contact);
-  res.status(200).end();
+  contact
+    .save()
+    .then(savedContact => {
+      res.json(contact.toJSON());
+      res.status(200).end();
+    })
+    .catch(error => next(error));
 });
 
 app.put("/api/persons/:id", (req, res, next) => {
@@ -112,6 +116,8 @@ const errorHandler = (error, request, response, next) => {
 
   if (error.name === "CastError" && error.kind === "ObjectId") {
     return response.status(400).send({ error: "malformatted id" });
+  } else if (error.name === "ValidationError") {
+    return response.status(400).json({ error: error.message });
   }
 
   next(error);
