@@ -6,7 +6,6 @@ const bodyParser = require("body-parser");
 const morgan = require("morgan");
 
 const Contact = require("./models/contacts");
-
 app.use(cors());
 app.use(bodyParser.json());
 app.use(express.static("build"));
@@ -34,10 +33,18 @@ app.get("/", (req, res) => {
   res.send("<h1>Hello World!</h1>");
 });
 
-app.get("/api/persons", (req, res) => {
-  Contact.find({}).then(contacts => {
-    res.json(contacts);
+app.get("/info", (req, res, next) => {
+  Contact.countDocuments({}).then(count => {
+    res.send(`<h4>Phonebook has ${count} people</h4><h4>${new Date()}</h4>`);
   });
+});
+
+app.get("/api/persons", (req, res, next) => {
+  Contact.find({})
+    .then(contacts => {
+      res.json(contacts);
+    })
+    .catch(error => next(error));
 });
 
 app.get("/api/persons/:id", (req, res, next) => {
@@ -71,6 +78,20 @@ app.post("/api/persons", (req, res) => {
   res.status(200).end();
 });
 
+app.put("/api/persons/:id", (req, res, next) => {
+  const body = req.body;
+
+  const contact = {
+    number: body.number
+  };
+
+  Contact.findByIdAndUpdate(req.params.id, contact, { new: true })
+    .then(updatedContact => {
+      res.json(updatedContact.toJSON());
+    })
+    .catch(error => next(error));
+});
+
 app.delete("/api/persons/:id", (req, res, next) => {
   Contact.findByIdAndDelete(req.params.id)
     .then(result => {
@@ -78,6 +99,26 @@ app.delete("/api/persons/:id", (req, res, next) => {
     })
     .catch(error => next(error));
 });
+
+const unknownEndpoint = (request, response) => {
+  response.status(404).send({ error: "unknown endpoint" });
+};
+
+// handler of requests with unknown endpoint
+app.use(unknownEndpoint);
+
+const errorHandler = (error, request, response, next) => {
+  console.error(error.message);
+
+  if (error.name === "CastError" && error.kind === "ObjectId") {
+    return response.status(400).send({ error: "malformatted id" });
+  }
+
+  next(error);
+};
+
+app.use(errorHandler);
+
 const PORT = process.env.PORT || 3001;
 
 app.listen(PORT, () => {
