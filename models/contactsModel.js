@@ -1,14 +1,14 @@
-const mongoose = require("mongoose");
-const uniqueValidator = require("mongoose-unique-validator");
+const mongoose = require('mongoose');
+const uniqueValidator = require('mongoose-unique-validator');
 
 const url = process.env.MONGODB_URI;
 mongoose
   .connect(url, { useNewUrlParser: true })
   .then(result => {
-    console.log("connected to", url);
+    console.log('connected to', url);
   })
   .catch(error => {
-    console.log("error connecting to database", error.message);
+    console.log('error connecting to database', error.message);
   });
 
 const contactSchema = new mongoose.Schema({
@@ -21,7 +21,7 @@ const contactSchema = new mongoose.Schema({
   number: { type: Number, min: 1000000, required: true }
 });
 
-contactSchema.set("toJSON", {
+contactSchema.set('toJSON', {
   transform: (document, returnedObject) => {
     returnedObject.id = returnedObject._id.toString();
     delete returnedObject._id;
@@ -31,4 +31,4 @@ contactSchema.set("toJSON", {
 
 contactSchema.plugin(uniqueValidator);
 
-module.exports = mongoose.model("Contact", contactSchema);
+module.exports = mongoose.model('Contact', contactSchema);

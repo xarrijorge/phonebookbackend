@@ -1,7 +1,7 @@
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
 if (process.argv.length < 3) {
-  console.log("please give a password as argument");
+  console.log('please give a password as argument');
   process.exit(1);
 }
 
@@ -18,7 +18,7 @@ const contactSchema = new mongoose.Schema({
   number: Number
 });
 
-const Contact = mongoose.model("Contact", contactSchema);
+const Contact = mongoose.model('Contact', contactSchema);
 
 if (process.argv.length >= 5) {
   const contact = new Contact({
@@ -32,7 +32,7 @@ if (process.argv.length >= 5) {
   });
 } else {
   Contact.find({}).then(res => {
-    console.log("phonebook:");
+    console.log('phonebook:');
     res.forEach(person => {
       console.log(`${person.name} ${person.number}`);
     });
